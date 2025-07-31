@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StickerVerse Editor Integration Example</title>
+  
+  <!-- Basic styling -->
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      margin: 0;
+      padding: 0;
+      color: #333;
+    }
+    
+    header {
+      background-color: #2d3748;
+      color: white;
+      padding: 1rem;
+      text-align: center;
+    }
+    
+    nav {
+      background-color: #4a5568;
+      padding: 0.5rem;
+      display: flex;
+      justify-content: center;
+    }
+    
+    nav a {
+      color: white;
+      text-decoration: none;
+      margin: 0 1rem;
+      padding: 0.5rem;
+    }
+    
+    nav a:hover {
+      background-color: #718096;
+      border-radius: 4px;
+    }
+    
+    main {
+      padding: 1rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    .editor-container {
+      height: 700px;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    footer {
+      background-color: #2d3748;
+      color: white;
+      text-align: center;
+      padding: 1rem;
+      margin-top: 2rem;
+    }
+  </style>
+  
+  <!-- Load React, React DOM, and other dependencies -->
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  
+  <!-- Firebase dependencies -->
+  <script src="https://www.gstatic.com/firebasejs/10.10.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.10.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.10.0/firebase-firestore-compat.js"></script>
+</head>
+<body>
+  <header>
+    <h1>Welcome to MySticker Website</h1>
+  </header>
+  
+  <nav>
+    <a href="#">Home</a>
+    <a href="#">Products</a>
+    <a href="#">Create Custom Sticker</a>
+    <a href="#">Contact</a>
+  </nav>
+  
+  <main>
+    <h2>Create Your Custom Sticker</h2>
+    <p>Use our interactive sticker editor below to design your perfect sticker!</p>
+    
+    <!-- This is where the sticker editor will be loaded -->
+    <div id="sticker-editor" class="editor-container"></div>
+    
+    <div style="margin-top: 2rem;">
+      <h3>Why Choose Our Stickers?</h3>
+      <ul>
+        <li>High-quality vinyl materials</li>
+        <li>Waterproof and durable</li>
+        <li>Custom shapes and sizes</li>
+        <li>Fast shipping worldwide</li>
+      </ul>
+    </div>
+  </main>
+  
+  <footer>
+    <p>&copy; 2025 MySticker Website. All rights reserved.</p>
+  </footer>
+  
+  <!-- Load the Sticker Editor -->
+  <link rel="stylesheet" href="./dist/stickerverse_sticker_editor.css">
+  <script src="./dist/sticker-editor.umd.js"></script>
+  <script>
+    // Initialize the sticker editor
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('DOM Content Loaded, checking for StickerEditor...');
+      if (window.StickerEditor) {
+        console.log('StickerEditor found on window, initializing...');
+        try {
+          window.StickerEditor.init('sticker-editor', {
+            // Any configuration options can go here
+          });
+          console.log('StickerEditor initialization called successfully');
+        } catch (error) {
+          console.error('Error initializing StickerEditor:', error);
+        }
+      } else {
+        console.error('StickerEditor not found on window object');
+        console.log('Available window properties:', Object.keys(window));
+      }
+    });
+  </script>
+</body>
+</html>

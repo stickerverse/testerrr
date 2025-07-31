@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🧪 Browser Integration Test</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      margin: 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(10px);
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    }
+    .test-result {
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 8px;
+      font-weight: bold;
+    }
+    .test-result.pass {
+      background: rgba(40, 167, 69, 0.3);
+      border-left: 4px solid #28a745;
+    }
+    .test-result.fail {
+      background: rgba(220, 53, 69, 0.3);
+      border-left: 4px solid #dc3545;
+    }
+    .test-result.info {
+      background: rgba(23, 162, 184, 0.3);
+      border-left: 4px solid #17a2b8;
+    }
+    .editor-container {
+      width: 100%;
+      height: 400px;
+      background: rgba(255,255,255,0.9);
+      border-radius: 10px;
+      margin: 20px 0;
+      position: relative;
+      overflow: hidden;
+    }
+    .loading {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #666;
+      font-size: 1.2rem;
+    }
+    button {
+      background: #28a745;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin: 5px;
+      font-size: 14px;
+    }
+    button:hover {
+      background: #218838;
+    }
+    .log {
+      background: rgba(0,0,0,0.5);
+      padding: 15px;
+      border-radius: 5px;
+      margin: 10px 0;
+      font-family: monospace;
+      font-size: 12px;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🧪 StickerVerse Browser Integration Test</h1>
+    <p>This page performs comprehensive testing of the editor integration.</p>
+    
+    <div id="test-results">
+      <div class="test-result info">⏳ Starting tests...</div>
+    </div>
+    
+    <div>
+      <button onclick="runAllTests()">🔄 Run All Tests</button>
+      <button onclick="testEditor()">🎨 Test Editor</button>
+      <button onclick="clearResults()">🗑️ Clear Results</button>
+    </div>
+    
+    <h2>Editor Container</h2>
+    <div id="sticker-editor" class="editor-container">
+      <div class="loading">⏳ Loading Editor...</div>
+    </div>
+    
+    <h2>Test Log</h2>
+    <div id="test-log" class="log">
+      <div>Initializing test environment...</div>
+    </div>
+  </div>
+
+  <!-- Load Editor CSS -->
+  <link rel="stylesheet" href="./dist/stickerverse_sticker_editor.css">
+  
+  <!-- Load React Dependencies -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  
+  <!-- Load Sticker Editor -->
+  <script src="./dist/simple-sticker-editor.umd.js"></script>
+  
+  <script>
+    let testResults = [];
+    let editorInstance = null;
+    
+    function log(message, type = 'info') {
+      const timestamp = new Date().toLocaleTimeString();
+      const logEl = document.getElementById('test-log');
+      const logEntry = document.createElement('div');
+      logEntry.innerHTML = `<span style="color: #888;">[${timestamp}]</span> ${message}`;
+      logEl.appendChild(logEntry);
+      logEl.scrollTop = logEl.scrollHeight;
+      console.log(`[${type.toUpperCase()}] ${message}`);
+    }
+    
+    function addTestResult(test, passed, message) {
+      testResults.push({ test, passed, message });
+      const resultsEl = document.getElementById('test-results');
+      const resultEl = document.createElement('div');
+      resultEl.className = `test-result ${passed ? 'pass' : 'fail'}`;
+      resultEl.innerHTML = `${passed ? '✅' : '❌'} ${test}: ${message}`;
+      resultsEl.appendChild(resultEl);
+    }
+    
+    function clearResults() {
+      document.getElementById('test-results').innerHTML = '<div class="test-result info">⏳ Ready for testing...</div>';
+      document.getElementById('test-log').innerHTML = '<div>Test log cleared...</div>';
+      testResults = [];
+      log('Test results cleared');
+    }
+    
+    function testReactLoading() {
+      log('Testing React loading...');
+      
+      if (typeof React === 'undefined') {
+        addTestResult('React Loading', false, 'React not found');
+        return false;
+      }
+      
+      if (typeof ReactDOM === 'undefined') {
+        addTestResult('ReactDOM Loading', false, 'ReactDOM not found');
+        return false;
+      }
+      
+      addTestResult('React Dependencies', true, `React ${React.version || 'loaded'}, ReactDOM loaded`);
+      log('✅ React dependencies loaded successfully');
+      return true;
+    }
+    
+    function testStickerEditorLoading() {
+      log('Testing StickerEditor loading...');
+      
+      if (typeof window.SimpleStickerEditor === 'undefined') {
+        addTestResult('SimpleStickerEditor Loading', false, 'SimpleStickerEditor not found on window');
+        return false;
+      }
+      
+      if (typeof window.SimpleStickerEditor.init !== 'function') {
+        addTestResult('SimpleStickerEditor Init', false, 'init function not found');
+        return false;
+      }
+      
+      addTestResult('SimpleStickerEditor Loading', true, 'SimpleStickerEditor loaded with init function');
+      log('✅ SimpleStickerEditor loaded successfully');
+      return true;
+    }
+    
+    function testEditorInitialization() {
+      log('Testing editor initialization...');
+      
+      try {
+        // Clear any existing content
+        const container = document.getElementById('sticker-editor');
+        if (!container) {
+          addTestResult('Editor Container', false, 'Container element not found');
+          return false;
+        }
+        
+        // Initialize the editor
+        editorInstance = window.SimpleStickerEditor.init('sticker-editor', {
+          theme: 'light',
+          debug: true
+        });
+        
+        if (!editorInstance) {
+          addTestResult('Editor Initialization', false, 'init() returned null/undefined');
+          return false;
+        }
+        
+        addTestResult('Editor Initialization', true, 'Editor initialized successfully');
+        log('✅ Editor initialized successfully');
+        
+        // Test unmount function
+        if (typeof editorInstance.unmount === 'function') {
+          addTestResult('Editor API', true, 'unmount method available');
+          log('✅ Editor API complete');
+        } else {
+          addTestResult('Editor API', false, 'unmount method missing');
+        }
+        
+        return true;
+        
+      } catch (error) {
+        addTestResult('Editor Initialization', false, `Error: ${error.message}`);
+        log(`❌ Editor initialization failed: ${error.message}`);
+        return false;
+      }
+    }
+    
+    function testEditor() {
+      log('Running editor-specific tests...');
+      
+      if (!editorInstance) {
+        addTestResult('Editor Test', false, 'No editor instance available');
+        return;
+      }
+      
+      // Test that something was rendered
+      const container = document.getElementById('sticker-editor');
+      if (container && container.children.length > 0) {
+        addTestResult('Editor Rendering', true, `${container.children.length} child elements rendered`);
+        log('✅ Editor rendered content to DOM');
+      } else {
+        addTestResult('Editor Rendering', false, 'No content rendered');
+        log('❌ No content found in editor container');
+      }
+      
+      // Look for React-specific elements
+      const reactElements = container.querySelectorAll('[data-reactroot], [data-react-component]');
+      if (reactElements.length > 0) {
+        addTestResult('React Integration', true, `${reactElements.length} React elements found`);
+      }
+    }
+    
+    function runAllTests() {
+      log('🚀 Starting comprehensive test suite...');
+      clearResults();
+      
+      let allPassed = true;
+      
+      // Test 1: React Dependencies
+      if (!testReactLoading()) allPassed = false;
+      
+      // Test 2: StickerEditor Loading
+      if (!testStickerEditorLoading()) allPassed = false;
+      
+      // Test 3: Editor Initialization
+      if (!testEditorInitialization()) allPassed = false;
+      
+      // Test 4: Editor Functionality
+      setTimeout(() => {
+        testEditor();
+        
+        // Final summary
+        const summary = allPassed ? 
+          '🎉 All critical tests passed! Editor integration is working.' :
+          '⚠️ Some tests failed. Check the results above.';
+        
+        addTestResult('Test Suite Complete', allPassed, summary);
+        log(`Test suite completed. Result: ${allPassed ? 'PASS' : 'FAIL'}`);
+      }, 1000);
+    }
+    
+    // Auto-run tests when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+      log('🌟 Page loaded, waiting for dependencies...');
+      
+      // Give scripts time to load
+      setTimeout(() => {
+        runAllTests();
+      }, 1000);
+    });
+    
+    // Error handling
+    window.addEventListener('error', function(e) {
+      log(`❌ JavaScript Error: ${e.message}`, 'error');
+      addTestResult('JavaScript Error', false, e.message);
+    });
+    
+    log('🧪 Browser test script loaded');
+  </script>
+</body>
+</html>

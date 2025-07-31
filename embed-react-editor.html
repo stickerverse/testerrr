@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StickerVerse Editor - React Embedding</title>
+  
+  <!-- Load Editor CSS -->
+  <link rel="stylesheet" href="./dist/stickerverse_sticker_editor.css">
+  
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
+    #editor-container {
+      width: 100%;
+      height: 100vh;
+    }
+    .loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background: #0f172a;
+      color: white;
+      font-family: system-ui, sans-serif;
+      font-size: 1.2rem;
+    }
+    .spinner {
+      width: 24px;
+      height: 24px;
+      border: 3px solid rgba(255,255,255,0.3);
+      border-top: 3px solid white;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-right: 12px;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <!-- Container for the React editor -->
+  <div id="editor-container">
+    <div class="loading">
+      <div class="spinner"></div>
+      Loading StickerVerse Editor...
+    </div>
+  </div>
+
+  <!-- Include React and ReactDOM libraries -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  
+  <!-- Include the StickerVerse Editor bundle -->
+  <script src="./dist/simple-sticker-editor.umd.js"></script>
+  
+  <script>
+    // Wait for DOM to be ready
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('DOM loaded, initializing StickerVerse editor...');
+      
+      // Get the container element
+      const editorContainer = document.getElementById('editor-container');
+      
+      if (!editorContainer) {
+        console.error('Editor container not found');
+        return;
+      }
+      
+      // Check if React libraries are loaded
+      if (typeof React === 'undefined') {
+        console.error('React library not loaded');
+        editorContainer.innerHTML = '<div class="loading" style="color: red;">❌ React library failed to load</div>';
+        return;
+      }
+      
+      if (typeof ReactDOM === 'undefined') {
+        console.error('ReactDOM library not loaded');
+        editorContainer.innerHTML = '<div class="loading" style="color: red;">❌ ReactDOM library failed to load</div>';
+        return;
+      }
+      
+      // Check if StickerVerse editor is loaded
+      if (typeof window.SimpleStickerEditor === 'undefined') {
+        console.error('SimpleStickerEditor not loaded');
+        editorContainer.innerHTML = '<div class="loading" style="color: red;">❌ StickerVerse Editor failed to load</div>';
+        return;
+      }
+      
+      console.log('All dependencies loaded successfully');
+      console.log('React version:', React.version);
+      console.log('SimpleStickerEditor:', window.SimpleStickerEditor);
+      
+      try {
+        // Initialize the StickerVerse editor using React 18 API
+        const root = ReactDOM.createRoot(editorContainer);
+        
+        // Use the built-in initialization function which handles the React rendering
+        const editorInstance = window.SimpleStickerEditor.init('editor-container', {
+          debug: true
+        });
+        
+        if (editorInstance) {
+          console.log('✅ StickerVerse Editor initialized successfully!');
+          console.log('Editor instance:', editorInstance);
+          
+          // Store reference for potential cleanup
+          window.stickerverseEditor = editorInstance;
+        } else {
+          console.error('❌ Editor initialization failed');
+          editorContainer.innerHTML = '<div class="loading" style="color: red;">❌ Failed to initialize editor</div>';
+        }
+        
+      } catch (error) {
+        console.error('❌ Error during editor initialization:', error);
+        editorContainer.innerHTML = `<div class="loading" style="color: red;">❌ Error: ${error.message}</div>`;
+      }
+    });
+    
+    // Global error handlers
+    window.addEventListener('error', function(e) {
+      console.error('Global error:', e.error);
+    });
+    
+    window.addEventListener('unhandledrejection', function(e) {
+      console.error('Unhandled promise rejection:', e.reason);
+    });
+    
+    // Cleanup function for page unload
+    window.addEventListener('beforeunload', function() {
+      if (window.stickerverseEditor && typeof window.stickerverseEditor.unmount === 'function') {
+        window.stickerverseEditor.unmount();
+      }
+    });
+  </script>
+</body>
+</html>

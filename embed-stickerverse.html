@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StickerVerse Editor - Full Integration</title>
+  
+  <!-- Load Editor CSS -->
+  <link rel="stylesheet" href="./dist/stickerverse_sticker_editor.css">
+  
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, sans-serif;
+    }
+    .header {
+      background: #1f2937;
+      color: white;
+      padding: 1rem;
+      text-align: center;
+    }
+    .editor-container {
+      width: 100%;
+      height: calc(100vh - 80px);
+      background: #0f172a;
+    }
+    .status {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: 600;
+      z-index: 1000;
+      transition: all 0.3s ease;
+      transform: translateX(100%);
+    }
+    .status.show {
+      transform: translateX(0);
+    }
+    .status.success {
+      background: #10b981;
+      color: white;
+    }
+    .status.error {
+      background: #ef4444;
+      color: white;
+    }
+    .loading {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: white;
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .spinner {
+      width: 24px;
+      height: 24px;
+      border: 3px solid rgba(255,255,255,0.3);
+      border-top: 3px solid white;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>🎨 StickerVerse Editor</h1>
+    <p>Full-featured sticker design editor embedded in webpage</p>
+  </div>
+  
+  <div id="status" class="status"></div>
+  
+  <div id="stickerverse-editor" class="editor-container">
+    <div class="loading">
+      <div class="spinner"></div>
+      <span>Loading StickerVerse Editor...</span>
+    </div>
+  </div>
+
+  <!-- Load StickerVerse Editor -->
+  <script src="./dist/simple-sticker-editor.umd.js"></script>
+  
+  <script>
+    const statusDiv = document.getElementById('status');
+    
+    function showStatus(message, type = 'success') {
+      statusDiv.textContent = message;
+      statusDiv.className = `status ${type} show`;
+      
+      setTimeout(() => {
+        statusDiv.classList.remove('show');
+      }, 3000);
+    }
+    
+    // Initialize the editor when DOM is ready
+    document.addEventListener('DOMContentLoaded', () => {
+      console.log('DOM loaded, initializing StickerVerse editor...');
+      
+      // Check if SimpleStickerEditor is available
+      if (typeof window.SimpleStickerEditor === 'undefined') {
+        console.error('SimpleStickerEditor not found on window object');
+        showStatus('❌ Failed to load StickerVerse Editor', 'error');
+        return;
+      }
+      
+      console.log('SimpleStickerEditor found:', window.SimpleStickerEditor);
+      
+      try {
+        // Initialize the full StickerVerse editor
+        const editorInstance = window.SimpleStickerEditor.init('stickerverse-editor', {
+          // Configuration options can be passed here
+          theme: 'dark', // Using dark theme to match the editor's design
+          debug: true
+        });
+        
+        if (editorInstance) {
+          console.log('✅ StickerVerse Editor initialized successfully!');
+          showStatus('✅ StickerVerse Editor loaded successfully!', 'success');
+          
+          // Log available methods
+          console.log('Editor instance methods:', Object.keys(editorInstance));
+        } else {
+          console.error('❌ Editor initialization returned null/undefined');
+          showStatus('❌ Failed to initialize editor', 'error');
+        }
+      } catch (error) {
+        console.error('❌ Error initializing StickerVerse Editor:', error);
+        showStatus('❌ Error: ' + error.message, 'error');
+      }
+    });
+    
+    // Global error handler
+    window.addEventListener('error', function(e) {
+      console.error('JavaScript Error:', e.error);
+      showStatus('❌ JavaScript Error: ' + e.message, 'error');
+    });
+    
+    // Handle unhandled promise rejections
+    window.addEventListener('unhandledrejection', function(e) {
+      console.error('Unhandled Promise Rejection:', e.reason);
+      showStatus('❌ Promise Error: ' + e.reason, 'error');
+    });
+  </script>
+</body>
+</html>

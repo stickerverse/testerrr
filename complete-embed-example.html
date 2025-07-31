@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Complete StickerVerse Editor Integration</title>
+  
+  <!-- Load the StickerVerse Editor CSS -->
+  <link rel="stylesheet" href="./dist/stickerverse_sticker_editor.css">
+  
+  <style>
+    /* Basic page styling */
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, sans-serif;
+      background: #f5f5f5;
+    }
+    
+    .page-header {
+      background: #1f2937;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+    
+    .page-content {
+      display: flex;
+      height: calc(100vh - 80px);
+    }
+    
+    .sidebar {
+      width: 300px;
+      background: white;
+      padding: 20px;
+      box-shadow: 2px 0 4px rgba(0,0,0,0.1);
+      overflow-y: auto;
+    }
+    
+    /* StickerVerse Editor Container */
+    .editor-section {
+      flex: 1;
+      background: #0f172a;
+      position: relative;
+    }
+    
+    #stickerverse-editor {
+      width: 100%;
+      height: 100%;
+    }
+    
+    /* Status and controls */
+    .controls {
+      margin-bottom: 20px;
+    }
+    
+    button {
+      background: #3b82f6;
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      margin: 4px;
+      font-weight: 600;
+    }
+    
+    button:hover {
+      background: #2563eb;
+    }
+    
+    button:disabled {
+      background: #9ca3af;
+      cursor: not-allowed;
+    }
+    
+    .status {
+      padding: 12px;
+      border-radius: 6px;
+      margin: 10px 0;
+      font-weight: 600;
+    }
+    
+    .status.success {
+      background: #d1fae5;
+      color: #065f46;
+      border: 1px solid #10b981;
+    }
+    
+    .status.error {
+      background: #fee2e2;
+      color: #991b1b;
+      border: 1px solid #ef4444;
+    }
+    
+    .status.info {
+      background: #dbeafe;
+      color: #1e40af;
+      border: 1px solid #3b82f6;
+    }
+    
+    .loading-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: #0f172a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 1.2rem;
+      z-index: 1000;
+    }
+    
+    .spinner {
+      width: 24px;
+      height: 24px;
+      border: 3px solid rgba(255,255,255,0.3);
+      border-top: 3px solid white;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-right: 12px;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    code {
+      background: #f3f4f6;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.9em;
+    }
+    
+    .integration-info {
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: 6px;
+      margin: 15px 0;
+      border-left: 4px solid #3b82f6;
+    }
+  </style>
+</head>
+<body>
+  <div class="page-header">
+    <h1>🎨 StickerVerse Editor Integration</h1>
+    <p>Complete example of embedding the StickerVerse sticker editor</p>
+  </div>
+  
+  <div class="page-content">
+    <!-- Sidebar with controls and info -->
+    <div class="sidebar">
+      <h3>Controls</h3>
+      <div class="controls">
+        <button id="init-btn" onclick="initializeEditor()">Initialize Editor</button>
+        <button id="destroy-btn" onclick="destroyEditor()" disabled>Destroy Editor</button>
+        <button onclick="testEditor()">Test Editor</button>
+      </div>
+      
+      <div id="status-area"></div>
+      
+      <div class="integration-info">
+        <h4>📋 Integration Steps:</h4>
+        <ol style="font-size: 14px; line-height: 1.6;">
+          <li>Include CSS: <code>stickerverse_sticker_editor.css</code></li>
+          <li>Include React 18 libraries</li>
+          <li>Include editor bundle: <code>simple-sticker-editor.umd.js</code></li>
+          <li>Call <code>SimpleStickerEditor.init()</code></li>
+        </ol>
+      </div>
+      
+      <div class="integration-info">
+        <h4>🔧 API Usage:</h4>
+        <pre style="font-size: 12px; overflow-x: auto;"><code>// Initialize
+const editor = SimpleStickerEditor.init(
+  'container-id', 
+  { debug: true }
+);
+
+// Cleanup
+editor.unmount();</code></pre>
+      </div>
+      
+      <div class="integration-info">
+        <h4>📦 Features Included:</h4>
+        <ul style="font-size: 14px; line-height: 1.4;">
+          <li>✅ Image upload & editing</li>
+          <li>✅ Shape selection</li>
+          <li>✅ Material options</li>
+          <li>✅ Text editor</li>
+          <li>✅ Clipart library</li>
+          <li>✅ Background removal</li>
+          <li>✅ Transform tools</li>
+          <li>✅ Preview & export</li>
+        </ul>
+      </div>
+    </div>
+    
+    <!-- Editor Section -->
+    <div class="editor-section">
+      <div id="loading-overlay" class="loading-overlay">
+        <div class="spinner"></div>
+        <span>Ready to load StickerVerse Editor...</span>
+      </div>
+      
+      <!-- This is where the StickerVerse editor will be rendered -->
+      <div id="stickerverse-editor"></div>
+    </div>
+  </div>
+
+  <!-- Step 1: Include React and ReactDOM libraries -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  
+  <!-- Step 2: Include the StickerVerse Editor bundle -->
+  <script src="./dist/simple-sticker-editor.umd.js"></script>
+  
+  <script>
+    // Global variables
+    let editorInstance = null;
+    let isInitialized = false;
+    
+    // UI Elements
+    const statusArea = document.getElementById('status-area');
+    const loadingOverlay = document.getElementById('loading-overlay');
+    const initBtn = document.getElementById('init-btn');
+    const destroyBtn = document.getElementById('destroy-btn');
+    
+    // Utility functions
+    function showStatus(message, type = 'info') {
+      const statusDiv = document.createElement('div');
+      statusDiv.className = `status ${type}`;
+      statusDiv.textContent = message;
+      
+      statusArea.innerHTML = '';
+      statusArea.appendChild(statusDiv);
+      
+      console.log(`[${type.toUpperCase()}] ${message}`);
+      
+      // Auto-hide after 5 seconds
+      setTimeout(() => {
+        if (statusArea.contains(statusDiv)) {
+          statusArea.removeChild(statusDiv);
+        }
+      }, 5000);
+    }
+    
+    function updateLoadingState(message) {
+      const loadingText = loadingOverlay.querySelector('span');
+      loadingText.textContent = message;
+    }
+    
+    function hideLoading() {
+      loadingOverlay.style.display = 'none';
+    }
+    
+    function showLoading(message = 'Loading...') {
+      loadingOverlay.style.display = 'flex';
+      updateLoadingState(message);
+    }
+    
+    // Step 3: Initialize the StickerVerse Editor
+    function initializeEditor() {
+      if (isInitialized) {
+        showStatus('Editor is already initialized', 'info');
+        return;
+      }
+      
+      console.log('🚀 Initializing StickerVerse Editor...');
+      showLoading('Initializing StickerVerse Editor...');
+      
+      // Check dependencies
+      if (typeof React === 'undefined') {
+        showStatus('❌ React library not loaded', 'error');
+        hideLoading();
+        return;
+      }
+      
+      if (typeof ReactDOM === 'undefined') {
+        showStatus('❌ ReactDOM library not loaded', 'error');
+        hideLoading();
+        return;
+      }
+      
+      if (typeof window.SimpleStickerEditor === 'undefined') {
+        showStatus('❌ StickerVerse Editor not loaded', 'error');
+        hideLoading();
+        return;
+      }
+      
+      try {
+        // Initialize the editor
+        editorInstance = window.SimpleStickerEditor.init('stickerverse-editor', {
+          debug: true
+        });
+        
+        if (editorInstance) {
+          isInitialized = true;
+          hideLoading();
+          showStatus('🎉 StickerVerse Editor initialized successfully!', 'success');
+          
+          // Update button states
+          initBtn.disabled = true;
+          destroyBtn.disabled = false;
+          
+          console.log('✅ Editor instance:', editorInstance);
+        } else {
+          showStatus('❌ Failed to initialize editor (returned null)', 'error');
+          hideLoading();
+        }
+      } catch (error) {
+        console.error('❌ Initialization error:', error);
+        showStatus(`❌ Error: ${error.message}`, 'error');
+        hideLoading();
+      }
+    }
+    
+    function destroyEditor() {
+      if (!isInitialized || !editorInstance) {
+        showStatus('No editor instance to destroy', 'info');
+        return;
+      }
+      
+      try {
+        if (typeof editorInstance.unmount === 'function') {
+          editorInstance.unmount();
+          showStatus('✅ Editor destroyed successfully', 'success');
+        } else {
+          showStatus('⚠️ Unmount method not available', 'info');
+        }
+        
+        editorInstance = null;
+        isInitialized = false;
+        
+        // Reset UI
+        showLoading('Ready to load StickerVerse Editor...');
+        initBtn.disabled = false;
+        destroyBtn.disabled = true;
+        
+      } catch (error) {
+        console.error('❌ Destroy error:', error);
+        showStatus(`❌ Error destroying editor: ${error.message}`, 'error');
+      }
+    }
+    
+    function testEditor() {
+      if (!isInitialized) {
+        showStatus('Please initialize the editor first', 'info');
+        return;
+      }
+      
+      console.log('🧪 Testing editor instance...');
+      console.log('Editor instance type:', typeof editorInstance);
+      console.log('Editor instance methods:', Object.keys(editorInstance || {}));
+      
+      const container = document.getElementById('stickerverse-editor');
+      const childCount = container ? container.children.length : 0;
+      
+      showStatus(`✅ Test complete - Editor has ${childCount} child elements`, 'success');
+    }
+    
+    // Initialize when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('🌟 Page loaded - StickerVerse Editor ready for initialization');
+      showStatus('Click "Initialize Editor" to load the StickerVerse sticker editor', 'info');
+      
+      // Log dependency status
+      console.log('Dependencies check:');
+      console.log('- React:', typeof React !== 'undefined' ? '✅' : '❌');
+      console.log('- ReactDOM:', typeof ReactDOM !== 'undefined' ? '✅' : '❌');
+      console.log('- SimpleStickerEditor:', typeof window.SimpleStickerEditor !== 'undefined' ? '✅' : '❌');
+    });
+    
+    // Error handling
+    window.addEventListener('error', function(e) {
+      console.error('Global error:', e.error);
+      showStatus(`JavaScript Error: ${e.message}`, 'error');
+    });
+    
+    window.addEventListener('unhandledrejection', function(e) {
+      console.error('Unhandled promise rejection:', e.reason);
+      showStatus(`Promise Error: ${e.reason}`, 'error');
+    });
+    
+    // Cleanup on page unload
+    window.addEventListener('beforeunload', function() {
+      if (editorInstance && typeof editorInstance.unmount === 'function') {
+        editorInstance.unmount();
+      }
+    });
+  </script>
+</body>
+</html>

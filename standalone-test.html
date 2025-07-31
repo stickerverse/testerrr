@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🎨 StickerVerse Editor - Standalone Test</title>
+  
+  <!-- Load Editor CSS -->
+  <link rel="stylesheet" href="./dist/stickerverse_sticker_editor.css">
+  
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(10px);
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .header h1 {
+      margin: 0 0 10px;
+      font-size: 2.5rem;
+      background: linear-gradient(45deg, #fff, #f0f8ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .editor-container {
+      width: 100%;
+      height: 600px;
+      background: rgba(255,255,255,0.95);
+      border-radius: 12px;
+      margin: 20px 0;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    }
+    .loading {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #666;
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .spinner {
+      width: 24px;
+      height: 24px;
+      border: 3px solid #ddd;
+      border-top: 3px solid #3498db;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .controls {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin: 20px 0;
+    }
+    button {
+      background: rgba(255,255,255,0.2);
+      border: 2px solid rgba(255,255,255,0.3);
+      color: white;
+      padding: 12px 24px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+    }
+    button:hover {
+      background: rgba(255,255,255,0.3);
+      border-color: rgba(255,255,255,0.5);
+      transform: translateY(-2px);
+    }
+    button:active {
+      transform: translateY(0);
+    }
+    .status {
+      text-align: center;
+      padding: 15px;
+      margin: 20px 0;
+      border-radius: 8px;
+      font-weight: 600;
+      display: none;
+    }
+    .status.success {
+      background: rgba(34, 197, 94, 0.2);
+      border: 1px solid rgba(34, 197, 94, 0.3);
+      color: #10b981;
+    }
+    .status.error {
+      background: rgba(239, 68, 68, 0.2);
+      border: 1px solid rgba(239, 68, 68, 0.3);  
+      color: #ef4444;
+    }
+    .info-panel {
+      background: rgba(0,0,0,0.3);
+      padding: 20px;
+      border-radius: 8px;
+      margin-top: 20px;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    .info-panel h3 {
+      margin-top: 0;
+      color: #60a5fa;
+    }
+    .console-output {
+      background: rgba(0,0,0,0.7);
+      padding: 15px;
+      border-radius: 8px;
+      margin: 15px 0;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      max-height: 200px;
+      overflow-y: auto;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .console-line {
+      margin: 2px 0;
+      word-break: break-word;
+    }
+    .console-line.success { color: #4ade80; }
+    .console-line.error { color: #f87171; }
+    .console-line.info { color: #60a5fa; }
+    .console-line.warn { color: #fbbf24; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🎨 StickerVerse Editor</h1>
+      <p>Standalone Integration Test</p>
+    </div>
+    
+    <div id="status" class="status"></div>
+    
+    <div class="controls">
+      <button onclick="initializeEditor()">🚀 Initialize Editor</button>
+      <button onclick="testEditor()">🧪 Test Editor</button>
+      <button onclick="reloadEditor()">🔄 Reload Editor</button>
+      <button onclick="clearConsole()">🗑️ Clear Console</button>
+    </div>
+    
+    <div id="sticker-editor" class="editor-container">
+      <div class="loading">
+        <div class="spinner"></div>
+        <span>Loading StickerVerse Editor...</span>
+      </div>
+    </div>
+    
+    <div class="info-panel">
+      <h3>📊 Console Output</h3>
+      <div id="console-output" class="console-output">
+        <div class="console-line info">🌟 Standalone test ready. Click "Initialize Editor" to begin.</div>
+      </div>
+    </div>
+    
+    <div class="info-panel">
+      <h3>📖 Instructions</h3>
+      <ol>
+        <li><strong>Initialize Editor:</strong> Loads the StickerVerse editor into the container above</li>
+        <li><strong>Test Editor:</strong> Runs basic functionality tests on the loaded editor</li>
+        <li><strong>Reload Editor:</strong> Clears and reinitializes the editor</li>
+        <li><strong>Clear Console:</strong> Clears the console output panel</li>
+      </ol>
+      <p><strong>Note:</strong> This page needs to be served from a web server (not opened as file://) for the editor to load properly.</p>
+      <p><strong>Server:</strong> You can start a local server with: <code>python3 -m http.server 8080</code> then visit <code>http://localhost:8080/standalone-test.html</code></p>
+      <p><strong>Expected Result:</strong> After clicking "Initialize Editor", you should see the StickerVerse editor interface load in the container above.</p>
+    </div>
+  </div>
+
+  <!-- Load React Dependencies -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  
+  <!-- Load StickerVerse Editor -->
+  <script src="./dist/simple-sticker-editor.umd.js" onload="console.log('✅ StickerVerse Editor UMD loaded'); window.umdLoaded = true;" onerror="console.log('❌ StickerVerse Editor UMD failed to load'); window.umdError = true;"></script>
+  
+  <script>
+    let editorInstance = null;
+    const consoleOutput = document.getElementById('console-output');
+    const statusDiv = document.getElementById('status');
+    
+    function logToConsole(message, type = 'info') {
+      const timestamp = new Date().toLocaleTimeString();
+      const line = document.createElement('div');
+      line.className = `console-line ${type}`;
+      line.innerHTML = `<span style="opacity: 0.7;">[${timestamp}]</span> ${message}`;
+      consoleOutput.appendChild(line);
+      consoleOutput.scrollTop = consoleOutput.scrollHeight;
+      
+      // Also log to browser console
+      console.log(`[${type.toUpperCase()}] ${message}`);
+    }
+    
+    function showStatus(message, type = 'success') {
+      statusDiv.textContent = message;
+      statusDiv.className = `status ${type}`;
+      statusDiv.style.display = 'block';
+      
+      setTimeout(() => {
+        statusDiv.style.display = 'none';
+      }, 5000);
+    }
+    
+    function clearConsole() {
+      consoleOutput.innerHTML = '<div class="console-line info">Console cleared...</div>';
+    }
+    
+    function initializeEditor() {
+      logToConsole('🚀 Starting editor initialization...', 'info');
+      
+      // Clear any existing content
+      const container = document.getElementById('sticker-editor');
+      container.innerHTML = '<div class="loading"><div class="spinner"></div><span>Initializing...</span></div>';
+      
+      // Check dependencies
+      if (typeof React === 'undefined') {
+        logToConsole('❌ React not loaded', 'error');
+        showStatus('❌ React library not loaded', 'error');
+        return;
+      }
+      logToConsole('✅ React loaded (version: ' + (React.version || 'unknown') + ')', 'success');
+      
+      if (typeof ReactDOM === 'undefined') {
+        logToConsole('❌ ReactDOM not loaded', 'error');
+        showStatus('❌ ReactDOM library not loaded', 'error');
+        return;
+      }
+      logToConsole('✅ ReactDOM loaded', 'success');
+      
+      if (typeof window.SimpleStickerEditor === 'undefined') {
+        logToConsole('❌ SimpleStickerEditor not found', 'error');
+        showStatus('❌ SimpleStickerEditor not loaded', 'error');
+        logToConsole('💡 Available window properties: ' + 
+          Object.keys(window).filter(k => k.includes('Sticker') || k.includes('Editor')).join(', '), 'info');
+        return;
+      }
+      logToConsole('✅ SimpleStickerEditor loaded', 'success');
+      
+      if (typeof window.SimpleStickerEditor.init !== 'function') {
+        logToConsole('❌ SimpleStickerEditor.init is not a function', 'error');
+        logToConsole('Available methods: ' + Object.keys(window.SimpleStickerEditor).join(', '), 'info');
+        showStatus('❌ SimpleStickerEditor.init not found', 'error');
+        return;
+      }
+      logToConsole('✅ SimpleStickerEditor.init function found', 'success');
+      
+      // Initialize the editor
+      try {
+        logToConsole('🎨 Calling SimpleStickerEditor.init...', 'info');
+        
+        editorInstance = window.SimpleStickerEditor.init('sticker-editor', {
+          debug: true
+        });
+        
+        if (editorInstance) {
+          logToConsole('🎉 Editor initialized successfully!', 'success');
+          showStatus('🎉 Editor loaded successfully!', 'success');
+          
+          // Check if content was rendered
+          setTimeout(() => {
+            const content = container.innerHTML;
+            if (content.trim() && !content.includes('Loading') && !content.includes('Initializing')) {
+              logToConsole(`✅ Content rendered (${content.length} characters)`, 'success');
+              logToConsole('🎨 Editor is ready for use!', 'success');
+            } else {
+              logToConsole('⚠️ Container may be empty after initialization', 'warn');
+              logToConsole('Container content: ' + container.innerHTML.substring(0, 200) + '...', 'info');
+            }
+          }, 1000);
+          
+        } else {
+          logToConsole('⚠️ Editor init returned null/undefined', 'warn');
+          showStatus('⚠️ Editor init returned no instance', 'error');
+        }
+      } catch (error) {
+        logToConsole('❌ Error initializing editor: ' + error.message, 'error');
+        logToConsole('❌ Error stack: ' + error.stack, 'error');
+        showStatus('❌ Error: ' + error.message, 'error');
+      }
+    }
+    
+    function testEditor() {
+      logToConsole('🧪 Running editor tests...', 'info');
+      
+      if (!editorInstance) {
+        logToConsole('❌ No editor instance available', 'error');
+        showStatus('❌ No editor instance to test', 'error');
+        return;
+      }
+      
+      // Test 1: Check instance
+      logToConsole('📋 Editor instance type: ' + typeof editorInstance, 'info');
+      logToConsole('📋 Editor instance keys: ' + Object.keys(editorInstance).join(', '), 'info');
+      
+      // Test 2: Check DOM content
+      const container = document.getElementById('sticker-editor');
+      if (container && container.children.length > 0) {
+        logToConsole(`✅ DOM content: ${container.children.length} child elements`, 'success');
+        
+        // Look for React elements
+        const reactElements = container.querySelectorAll('[data-reactroot], div[class*="react"]');
+        if (reactElements.length > 0) {
+          logToConsole(`✅ React integration: ${reactElements.length} React elements found`, 'success');
+        }
+      } else {
+        logToConsole('⚠️ No DOM content found in container', 'warn');
+      }
+      
+      // Test 3: Check unmount capability
+      if (typeof editorInstance.unmount === 'function') {
+        logToConsole('✅ Unmount function available', 'success');
+      } else {
+        logToConsole('⚠️ Unmount function not found', 'warn');
+      }
+      
+      logToConsole('🎉 Test suite completed!', 'success');
+      showStatus('✅ Tests completed successfully', 'success');
+    }
+    
+    function reloadEditor() {
+      logToConsole('🔄 Reloading editor...', 'info');
+      
+      if (editorInstance && typeof editorInstance.unmount === 'function') {
+        try {
+          editorInstance.unmount();
+          logToConsole('✅ Previous instance unmounted', 'success');
+        } catch (error) {
+          logToConsole('⚠️ Error unmounting: ' + error.message, 'warn');
+        }
+      }
+      
+      editorInstance = null;
+      
+      setTimeout(() => {
+        initializeEditor();
+      }, 100);
+    }
+    
+    // Initialize on page load
+    window.addEventListener('load', function() {
+      logToConsole('🌟 Page loaded, ready for testing', 'info');
+      
+      // Debug: Check script loading status
+      logToConsole('🔍 Debugging script loading...', 'info');
+      logToConsole('UMD script loaded: ' + (window.umdLoaded ? 'Yes' : 'No'), 'info');
+      logToConsole('UMD script error: ' + (window.umdError ? 'Yes' : 'No'), 'info');
+      
+      // Debug: Check what's actually on the window object
+      logToConsole('🔍 Debugging window object...', 'info');
+      
+      // Check for SimpleStickerEditor variations
+      const stickerProps = Object.keys(window).filter(key => 
+        key.toLowerCase().includes('sticker') || key.toLowerCase().includes('editor')
+      );
+      logToConsole('Window properties with "sticker" or "editor": ' + 
+        (stickerProps.length > 0 ? stickerProps.join(', ') : 'none'), 'info');
+      
+      // Check if any variation exists
+      if (window.SimpleStickerEditor) {
+        logToConsole('✅ SimpleStickerEditor found on window', 'success');
+        logToConsole('SimpleStickerEditor keys: ' + Object.keys(window.SimpleStickerEditor).join(', '), 'info');
+        if (window.SimpleStickerEditor.init) {
+          logToConsole('✅ SimpleStickerEditor.init function found', 'success');
+        } else {
+          logToConsole('❌ SimpleStickerEditor.init NOT found', 'error');
+        }
+      } else {
+        logToConsole('❌ SimpleStickerEditor NOT found on window', 'error');
+      }
+      
+      logToConsole('💡 Click "Initialize Editor" to start', 'info');
+    });
+    
+    // Error handling
+    window.addEventListener('error', function(e) {
+      logToConsole('❌ JavaScript Error: ' + e.message, 'error');
+    });
+  </script>
+</body>
+</html>

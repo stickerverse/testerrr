@@ -1,0 +1,5 @@
+{
+  "name": "Stickerverse",
+  "description": "Interactive sticker design editor with real-time preview, material selection, and Firebase integration.",
+  "requestFramePermissions": []
+}

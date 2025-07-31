@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Minimal StickerEditor Integration Example</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    #sticker-container {
+      width: 100%;
+      height: 700px;
+      border: 1px solid #ccc;
+      margin: 0 auto;
+    }
+  </style>
+  <!-- Include our built styles -->
+  <link rel="stylesheet" href="./dist/stickerverse_sticker_editor.css">
+</head>
+<body>
+  <h1>Minimal StickerEditor Example</h1>
+  
+  <!-- This is the container for our sticker editor -->
+  <div id="sticker-container"></div>
+  
+  <!-- Include necessary libraries -->
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  
+  <!-- Include our library -->
+  <script src="./dist/sticker-editor.umd.js"></script>
+  
+  <script>
+    console.log('Script loaded. Checking for StickerEditor...');
+    
+    // Check if StickerEditor is available
+    if (window.StickerEditor) {
+      console.log('StickerEditor found on window. Available methods:', Object.keys(window.StickerEditor));
+      
+      // Initialize when the DOM is fully loaded
+      document.addEventListener('DOMContentLoaded', function() {
+        console.log('DOM loaded. Initializing StickerEditor...');
+        try {
+          window.StickerEditor.init('sticker-container');
+          console.log('StickerEditor initialized successfully');
+        } catch (error) {
+          console.error('Error initializing StickerEditor:', error);
+        }
+      });
+    } else {
+      console.error('StickerEditor not found on window object!');
+      console.log('Available window properties:', Object.keys(window));
+    }
+  </script>
+</body>
+</html>

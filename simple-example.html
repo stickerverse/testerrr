@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simple Sticker Editor Example</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    #sticker-container {
+      width: 100%;
+      height: 600px;
+      border: 2px solid #333;
+      border-radius: 8px;
+      overflow: hidden;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Simple Sticker Editor Integration</h1>
+  <p>This is a minimal example showing how to integrate the Simple Sticker Editor.</p>
+  
+  <div id="sticker-container"></div>
+  
+  <!-- Directly include React -->
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  
+  <!-- Include our bundled editor -->
+  <script src="./dist/simple-sticker-editor.umd.js"></script>
+  
+  <script>
+    console.log('Page loaded');
+    console.log('Window properties:', Object.keys(window));
+    
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('DOM loaded, checking for SimpleStickerEditor');
+      
+      if (window.SimpleStickerEditor) {
+        console.log('SimpleStickerEditor found:', window.SimpleStickerEditor);
+        window.SimpleStickerEditor.init('sticker-container');
+      } else {
+        console.error('SimpleStickerEditor not found on window!');
+      }
+    });
+  </script>
+</body>
+</html>

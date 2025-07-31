@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StickerVerse - Custom Sticker Creator</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      background-color: #f8f9fa;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 1rem 0;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .header-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-size: 2rem;
+      font-weight: bold;
+    }
+
+    .nav {
+      display: flex;
+      gap: 2rem;
+    }
+
+    .nav a {
+      color: white;
+      text-decoration: none;
+      font-weight: 500;
+      transition: opacity 0.3s ease;
+    }
+
+    .nav a:hover {
+      opacity: 0.8;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 4rem 0;
+      text-align: center;
+    }
+
+    .hero-content {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    .hero h1 {
+      font-size: 3.5rem;
+      margin-bottom: 1rem;
+      font-weight: 700;
+    }
+
+    .hero p {
+      font-size: 1.3rem;
+      margin-bottom: 2rem;
+      opacity: 0.9;
+    }
+
+    .cta-button {
+      display: inline-block;
+      background: #ff6b6b;
+      color: white;
+      padding: 1rem 2rem;
+      text-decoration: none;
+      border-radius: 50px;
+      font-weight: 600;
+      font-size: 1.1rem;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+    }
+
+    .cta-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+    }
+
+    .main-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 4rem 20px;
+    }
+
+    .section {
+      margin-bottom: 4rem;
+    }
+
+    .section h2 {
+      font-size: 2.5rem;
+      margin-bottom: 1.5rem;
+      text-align: center;
+      color: #2c3e50;
+    }
+
+    .section p {
+      font-size: 1.2rem;
+      text-align: center;
+      color: #666;
+      margin-bottom: 3rem;
+    }
+
+    .editor-container {
+      background: white;
+      border-radius: 15px;
+      padding: 2rem;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      margin-bottom: 3rem;
+    }
+
+    .editor-wrapper {
+      width: 100%;
+      height: 700px;
+      border: 2px solid #e9ecef;
+      border-radius: 10px;
+      overflow: hidden;
+      background: #f8f9fa;
+      position: relative;
+    }
+
+    .loading-message {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      color: #666;
+      font-size: 1.1rem;
+    }
+
+    .loading-spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #667eea;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 1rem;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      margin-top: 3rem;
+    }
+
+    .feature {
+      background: white;
+      padding: 2rem;
+      border-radius: 10px;
+      text-align: center;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+      transition: transform 0.3s ease;
+    }
+
+    .feature:hover {
+      transform: translateY(-5px);
+    }
+
+    .feature-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+
+    .feature h3 {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+      color: #2c3e50;
+    }
+
+    .feature p {
+      color: #666;
+      font-size: 1rem;
+      text-align: center;
+    }
+
+    .footer {
+      background: #2c3e50;
+      color: white;
+      text-align: center;
+      padding: 2rem 0;
+      margin-top: 4rem;
+    }
+
+    .error-message {
+      background: #ff4757;
+      color: white;
+      padding: 1rem;
+      border-radius: 5px;
+      text-align: center;
+      margin: 1rem 0;
+      display: none;
+    }
+
+    .success-message {
+      background: #26de81;
+      color: white;
+      padding: 1rem;
+      border-radius: 5px;
+      text-align: center;
+      margin: 1rem 0;
+      display: none;
+    }
+
+    @media (max-width: 768px) {
+      .hero h1 {
+        font-size: 2.5rem;
+      }
+      
+      .hero p {
+        font-size: 1.1rem;
+      }
+      
+      .editor-wrapper {
+        height: 500px;
+      }
+      
+      .nav {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <div class="logo">🎨 StickerVerse</div>
+      <nav class="nav">
+        <a href="#home">Home</a>
+        <a href="#editor">Create</a>
+        <a href="#features">Features</a>
+        <a href="#contact">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero" id="home">
+    <div class="hero-content">
+      <h1>Create Amazing Stickers</h1>
+      <p>Design custom stickers with our powerful, easy-to-use editor. Perfect for personal use, business branding, or creative projects.</p>
+      <a href="#editor" class="cta-button">Start Creating Now</a>
+    </div>
+  </section>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Editor Section -->
+    <section class="section" id="editor">
+      <h2>Sticker Editor</h2>
+      <p>Use our interactive editor to create your perfect sticker design</p>
+      
+      <div class="editor-container">
+        <div id="editor-status"></div>
+        
+        <!-- Sticker Editor Container -->
+        <div id="sticker-editor" class="editor-wrapper">
+          <div class="loading-message">
+            <div class="loading-spinner"></div>
+            <div>Loading Sticker Editor...</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="section" id="features">
+      <h2>Why Choose StickerVerse?</h2>
+      <p>Everything you need to create professional-quality stickers</p>
+      
+      <div class="features">
+        <div class="feature">
+          <div class="feature-icon">🎨</div>
+          <h3>Easy Design Tools</h3>
+          <p>Intuitive drag-and-drop interface with powerful design capabilities</p>
+        </div>
+        
+        <div class="feature">
+          <div class="feature-icon">📱</div>
+          <h3>Mobile Friendly</h3>
+          <p>Works perfectly on desktop, tablet, and mobile devices</p>
+        </div>
+        
+        <div class="feature">
+          <div class="feature-icon">⚡</div>
+          <h3>Fast & Reliable</h3>
+          <p>Lightning-fast editor with real-time preview and instant saving</p>
+        </div>
+        
+        <div class="feature">
+          <div class="feature-icon">🔧</div>
+          <h3>Advanced Features</h3>
+          <p>Text tools, shapes, images, backgrounds, and much more</p>
+        </div>
+        
+        <div class="feature">
+          <div class="feature-icon">💾</div>
+          <h3>Export Options</h3>
+          <p>Download your designs in multiple formats for any use case</p>
+        </div>
+        
+        <div class="feature">
+          <div class="feature-icon">🔒</div>
+          <h3>Secure & Private</h3>
+          <p>Your designs are safe and secure with us</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer" id="contact">
+    <p>&copy; 2025 StickerVerse. All rights reserved. | Create amazing stickers with ease!</p>
+  </footer>
+
+  <!-- Load React Dependencies -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  
+  <!-- Load Sticker Editor -->
+  <script src="./dist/simple-sticker-editor.umd.js"></script>
+  
+  <!-- Initialize Editor -->
+  <script>
+    console.log('🎨 StickerVerse - Initializing...');
+    
+    function showStatus(message, type = 'info') {
+      const statusEl = document.getElementById('editor-status');
+      statusEl.className = type === 'error' ? 'error-message' : 'success-message';
+      statusEl.style.display = 'block';
+      statusEl.textContent = message;
+      
+      if (type === 'success') {
+        setTimeout(() => {
+          statusEl.style.display = 'none';
+        }, 3000);
+      }
+    }
+    
+    function hideLoadingMessage() {
+      const loadingEl = document.querySelector('.loading-message');
+      if (loadingEl) {
+        loadingEl.style.display = 'none';
+      }
+    }
+    
+    // Smooth scrolling for navigation links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+          });
+        }
+      });
+    });
+    
+    // Initialize the sticker editor when DOM is ready
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('🎨 DOM loaded, checking for SimpleStickerEditor...');
+      
+      // Add a small delay to ensure everything is loaded
+      setTimeout(() => {
+        if (window.SimpleStickerEditor) {
+          console.log('✅ SimpleStickerEditor found, initializing...');
+          
+          try {
+            // Initialize the editor
+            const editorInstance = window.SimpleStickerEditor.init('sticker-editor', {
+              // Add any configuration options here
+              theme: 'light',
+              showWelcome: true
+            });
+            
+            hideLoadingMessage();
+            showStatus('🎉 Sticker Editor loaded successfully!', 'success');
+            console.log('✅ SimpleStickerEditor initialized successfully');
+            
+            // Store editor instance globally for debugging
+            window.editorInstance = editorInstance;
+            
+          } catch (error) {
+            console.error('❌ Error initializing SimpleStickerEditor:', error);
+            hideLoadingMessage();
+            showStatus('❌ Failed to load Sticker Editor: ' + error.message, 'error');
+          }
+        } else {
+          console.error('❌ SimpleStickerEditor not found on window object');
+          console.log('Available window properties:', Object.keys(window).filter(key => key.includes('Sticker')));
+          
+          hideLoadingMessage();
+          showStatus('❌ Sticker Editor failed to load. Please refresh the page.', 'error');
+        }
+      }, 500);
+    });
+    
+    // Add error handling for script loading
+    window.addEventListener('error', function(e) {
+      if (e.filename && e.filename.includes('sticker-editor')) {
+        console.error('❌ Error loading sticker editor script:', e);
+        hideLoadingMessage();
+        showStatus('❌ Failed to load Sticker Editor script', 'error');
+      }
+    });
+    
+    console.log('🎨 StickerVerse initialization script loaded');
+  </script>
+</body>
+</html>

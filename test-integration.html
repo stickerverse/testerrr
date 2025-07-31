@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Integration Test - StickerVerse Editor</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      margin: 20px;
+      background: #f5f5f5;
+    }
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .editor-container {
+      width: 100%;
+      height: 500px;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      margin: 20px 0;
+      background: #fafafa;
+    }
+    .status {
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 5px;
+      display: none;
+    }
+    .status.success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+    .status.error {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+    .debug-info {
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: 5px;
+      margin: 10px 0;
+      font-family: monospace;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎨 StickerVerse Editor Integration Test</h1>
+    <p>This page tests the integration of the StickerVerse sticker editor.</p>
+    
+    <div id="status" class="status"></div>
+    
+    <h2>Editor Container</h2>
+    <div id="sticker-editor" class="editor-container">
+      <div style="display: flex; justify-content: center; align-items: center; height: 100%; color: #666;">
+        Loading editor...
+      </div>
+    </div>
+    
+    <div class="debug-info">
+      <h3>Debug Information:</h3>
+      <div id="debug-output">
+        <p>Initializing...</p>
+      </div>
+    </div>
+    
+    <button onclick="testEditor()" style="background: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin: 10px 5px;">
+      Test Editor
+    </button>
+    
+    <button onclick="reloadEditor()" style="background: #28a745; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin: 10px 5px;">
+      Reload Editor
+    </button>
+    
+    <button onclick="clearDebug()" style="background: #6c757d; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin: 10px 5px;">
+      Clear Debug
+    </button>
+  </div>
+
+  <!-- Load Editor CSS -->
+  <link rel="stylesheet" href="./dist/stickerverse_sticker_editor.css">
+  
+  <!-- Load React Dependencies -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  
+  <!-- Load Sticker Editor -->
+  <script src="./dist/simple-sticker-editor.umd.js"></script>
+  
+  <script>
+    let editorInstance = null;
+    let debugOutput = document.getElementById('debug-output');
+    let statusDiv = document.getElementById('status');
+    
+    function log(message, type = 'info') {
+      console.log(`[${type.toUpperCase()}] ${message}`);
+      debugOutput.innerHTML += `<p style="color: ${type === 'error' ? 'red' : type === 'success' ? 'green' : 'black'};">[${new Date().toLocaleTimeString()}] ${message}</p>`;
+      debugOutput.scrollTop = debugOutput.scrollHeight;
+    }
+    
+    function showStatus(message, type = 'success') {
+      statusDiv.textContent = message;
+      statusDiv.className = `status ${type}`;
+      statusDiv.style.display = 'block';
+      
+      if (type === 'success') {
+        setTimeout(() => {
+          statusDiv.style.display = 'none';
+        }, 5000);
+      }
+    }
+    
+    function testEditor() {
+      log('Testing editor functionality...', 'info');
+      
+      if (editorInstance) {
+        log('Editor instance found', 'success');
+        showStatus('✅ Editor is working!', 'success');
+      } else {
+        log('No editor instance found', 'error');
+        showStatus('❌ Editor not initialized', 'error');
+      }
+    }
+    
+    function reloadEditor() {
+      log('Reloading editor...', 'info');
+      initializeEditor();
+    }
+    
+    function clearDebug() {
+      debugOutput.innerHTML = '<p>Debug cleared...</p>';
+    }
+    
+    function initializeEditor() {
+      log('Starting editor initialization...', 'info');
+      
+      // Check if React is loaded
+      if (typeof React === 'undefined') {
+        log('❌ React not loaded', 'error');
+        showStatus('❌ React library not loaded', 'error');
+        return;
+      }
+      log('✅ React loaded successfully (version: ' + (React.version || 'unknown') + ')', 'success');
+      
+      // Check if ReactDOM is loaded
+      if (typeof ReactDOM === 'undefined') {
+        log('❌ ReactDOM not loaded', 'error');
+        showStatus('❌ ReactDOM library not loaded', 'error');
+        return;
+      }
+      log('✅ ReactDOM loaded successfully', 'success');
+      
+      // Check if SimpleStickerEditor is available
+      if (typeof window.SimpleStickerEditor === 'undefined') {
+        log('❌ SimpleStickerEditor not found on window', 'error');
+        
+        // Debug: Show all window properties that might be related
+        const stickerProps = Object.keys(window).filter(key => 
+          key.toLowerCase().includes('sticker') || key.toLowerCase().includes('editor')
+        );
+        log('Available window properties with "sticker" or "editor": ' + 
+          (stickerProps.length > 0 ? stickerProps.join(', ') : 'none'), 'info');
+        
+        showStatus('❌ SimpleStickerEditor not loaded', 'error');
+        return;
+      }
+      log('✅ SimpleStickerEditor found on window', 'success');
+      
+      // Debug: Show the structure of SimpleStickerEditor
+      log('SimpleStickerEditor object keys: ' + Object.keys(window.SimpleStickerEditor).join(', '), 'info');
+      
+      // Check if init function exists
+      if (typeof window.SimpleStickerEditor.init !== 'function') {
+        log('❌ SimpleStickerEditor.init is not a function', 'error');
+        log('Type of SimpleStickerEditor.init: ' + typeof window.SimpleStickerEditor.init, 'error');
+        showStatus('❌ SimpleStickerEditor.init not found', 'error');
+        return;
+      }
+      log('✅ SimpleStickerEditor.init function found', 'success');
+      
+      // Check if target container exists
+      const container = document.getElementById('sticker-editor');
+      if (!container) {
+        log('❌ Container element "sticker-editor" not found', 'error');
+        showStatus('❌ Container element not found', 'error');
+        return;
+      }
+      log('✅ Container element found: ' + container.tagName + ' with ID "' + container.id + '"', 'success');
+      
+      // Try to initialize the editor
+      try {
+        log('Calling SimpleStickerEditor.init("sticker-editor", options)...', 'info');
+        
+        const options = {
+          theme: 'light',
+          debug: true
+        };
+        log('Options: ' + JSON.stringify(options, null, 2), 'info');
+        
+        editorInstance = window.SimpleStickerEditor.init('sticker-editor', options);
+        
+        if (editorInstance) {
+          log('✅ Editor initialized successfully!', 'success');
+          log('Editor instance type: ' + typeof editorInstance, 'info');
+          log('Editor instance keys: ' + Object.keys(editorInstance).join(', '), 'info');
+          showStatus('🎉 Editor loaded successfully!', 'success');
+          
+          // Check if something was rendered
+          setTimeout(() => {
+            const containerContent = container.innerHTML;
+            if (containerContent.trim()) {
+              log('✅ Content rendered in container (' + containerContent.length + ' characters)', 'success');
+            } else {
+              log('⚠️ Container appears empty after initialization', 'error');
+            }
+          }, 100);
+          
+        } else {
+          log('⚠️ Editor init returned null/undefined', 'error');
+          showStatus('⚠️ Editor init returned no instance', 'error');
+        }
+      } catch (error) {
+        log('❌ Error initializing editor: ' + error.message, 'error');
+        log('Error stack: ' + (error.stack || 'No stack trace'), 'error');
+        showStatus('❌ Error: ' + error.message, 'error');
+      }
+    }
+    
+    // Initialize when DOM is ready
+    document.addEventListener('DOMContentLoaded', function() {
+      log('DOM Content Loaded', 'info');
+      
+      // Add a small delay to ensure all scripts are loaded
+      setTimeout(() => {
+        initializeEditor();
+      }, 500);
+    });
+    
+    // Handle script loading errors
+    window.addEventListener('error', function(e) {
+      if (e.filename && e.filename.includes('sticker-editor')) {
+        log('❌ Script loading error: ' + e.message, 'error');
+        showStatus('❌ Failed to load editor script', 'error');
+      }
+    });
+    
+    log('Integration test script loaded', 'info');
+  </script>
+</body>
+</html>

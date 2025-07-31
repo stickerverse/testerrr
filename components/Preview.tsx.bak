@@ -1,0 +1,71 @@
+import React from 'react';
+import { TransformableImage } from './TransformableImage';
+import type { Shape } from '../types';
+
+interface PreviewProps {
+  selectedImage: string | null;
+  setSelectedImage: (image: string | null) => void;
+  selectedShape: Shape;
+}
+
+interface ViewToggleProps {
+    children: React.ReactNode;
+    active?: boolean;
+    badge?: string;
+}
+
+const ViewToggleButton: React.FC<ViewToggleProps> = ({ children, active = false, badge }) => (
+    <button className={`relative text-sm font-bold py-2 px-4 rounded-full transition-all duration-300 backdrop-blur-lg border hover:scale-105 hover:-translate-y-0.5
+        ${active 
+            ? 'bg-blue-500/20 text-white border-blue-400 shadow-lg shadow-blue-500/20' 
+            : 'bg-white/5 text-zinc-300 border-white/10 hover:bg-white/10 hover:text-white'
+        }`}>
+        {children}
+        {badge && <span className="absolute -top-1 -right-1 text-xs bg-green-400 text-black font-bold rounded-full px-1.5 py-0.5">{badge}</span>}
+    </button>
+);
+
+
+const getShapeClasses = (shapeId: string) => {
+    switch (shapeId) {
+        case 'circle': return 'rounded-full aspect-square';
+        case 'square': return 'rounded-none aspect-square';
+        case 'rounded-square': return 'rounded-3xl aspect-square';
+        case 'rectangle': return 'rounded-xl aspect-[4/3]';
+        case 'oval': return 'rounded-full aspect-[4/3]';
+        default: return ''; // For die-cut
+    }
+}
+
+export const Preview: React.FC<PreviewProps> = ({ selectedImage, setSelectedImage, selectedShape }) => {
+  const isDieCut = selectedShape.id === 'die-cut';
+
+  const ShapeContainer: React.FC<{children: React.ReactNode}> = ({ children }) => {
+    if (isDieCut) {
+        return <>{children}</>;
+    }
+
+    return (
+      <div 
+        className={`relative w-[350px] overflow-hidden flex items-center justify-center transition-all duration-300 ${getShapeClasses(selectedShape.id)}`}
+        // This container clips the content (the TransformableImage)
+      >
+          {children}
+          {/* Dashed border to show the shape outline */}
+          <div className="absolute inset-0 border-2 border-dashed border-zinc-500/80 pointer-events-none" style={{ borderRadius: 'inherit' }}></div>
+      </div>
+    )
+  }
+
+  
+
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-4 z-20">
+        <div className="flex items-center bg-black/20 backdrop-blur-lg border border-white/10 rounded-full p-1 shadow-lg">
+            <ViewToggleButton active>STICKER</ViewToggleButton>
+            <ViewToggleButton badge="TRY">BACK PAPER</ViewToggleButton>
+        </div>
+        <button className="text-zinc-400 hover:text-white text-sm font-semibold transition-transform duration-300 hover:scale-105">Screenshot</button>
+      </div>
+    </div>
+  );
+};

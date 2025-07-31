@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StickerVerse Editor - Simple Integration</title>
+  
+  <!-- Load Editor CSS -->
+  <link rel="stylesheet" href="./dist/stickerverse_sticker_editor.css">
+  
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: #f0f0f0;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .editor-container {
+      width: 100%;
+      height: 600px;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      margin: 20px 0;
+      background: #fafafa;
+    }
+    button {
+      background: #3b82f6;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      margin: 5px;
+      font-weight: 600;
+    }
+    button:hover {
+      background: #2563eb;
+    }
+    .status {
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 4px;
+      display: none;
+    }
+    .status.success {
+      background: #d1fae5;
+      color: #065f46;
+      border: 1px solid #10b981;
+    }
+    .status.error {
+      background: #fee2e2;
+      color: #991b1b;
+      border: 1px solid #ef4444;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎨 StickerVerse Editor - Simple Integration</h1>
+    <p>This is a minimal example of embedding the StickerVerse sticker editor.</p>
+    
+    <div id="status" class="status"></div>
+    
+    <div>
+      <button onclick="initEditor()">Initialize Editor</button>
+      <button onclick="destroyEditor()">Destroy Editor</button>
+    </div>
+    
+    <div id="sticker-editor" class="editor-container">
+      <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #666;">
+        Click "Initialize Editor" to load the sticker editor
+      </div>
+    </div>
+    
+    <div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 4px;">
+      <h3>Integration Code:</h3>
+      <pre style="background: #fff; padding: 10px; border-radius: 4px; overflow-x: auto;"><code>&lt;!-- Include CSS --&gt;
+&lt;link rel="stylesheet" href="./dist/stickerverse_sticker_editor.css"&gt;
+
+&lt;!-- Include React dependencies --&gt;
+&lt;script src="https://unpkg.com/react@18/umd/react.production.min.js"&gt;&lt;/script&gt;
+&lt;script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"&gt;&lt;/script&gt;
+
+&lt;!-- Include StickerVerse Editor --&gt;
+&lt;script src="./dist/simple-sticker-editor.umd.js"&gt;&lt;/script&gt;
+
+&lt;!-- Initialize --&gt;
+&lt;script&gt;
+  const editor = window.SimpleStickerEditor.init('container-id', {
+    theme: 'light',
+    width: '100%',
+    height: '600px'
+  });
+&lt;/script&gt;</code></pre>
+    </div>
+  </div>
+
+  <!-- Load React Dependencies -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  
+  <!-- Load Sticker Editor -->
+  <script src="./dist/simple-sticker-editor.umd.js"></script>
+  
+  <script>
+    let editorInstance = null;
+    const statusDiv = document.getElementById('status');
+    
+    function showStatus(message, type = 'success') {
+      statusDiv.textContent = message;
+      statusDiv.className = `status ${type}`;
+      statusDiv.style.display = 'block';
+      
+      setTimeout(() => {
+        statusDiv.style.display = 'none';
+      }, 3000);
+    }
+    
+    function initEditor() {
+      console.log('Initializing StickerVerse Editor...');
+      
+      // Check if dependencies are loaded
+      if (typeof React === 'undefined') {
+        showStatus('❌ React not loaded', 'error');
+        return;
+      }
+      
+      if (typeof ReactDOM === 'undefined') {
+        showStatus('❌ ReactDOM not loaded', 'error');
+        return;
+      }
+      
+      if (typeof window.SimpleStickerEditor === 'undefined') {
+        showStatus('❌ SimpleStickerEditor not loaded', 'error');
+        return;
+      }
+      
+      try {
+        // Initialize the editor
+        editorInstance = window.SimpleStickerEditor.init('sticker-editor', {
+          theme: 'light',
+          width: '100%',
+          height: '100%',
+          debug: true
+        });
+        
+        if (editorInstance) {
+          showStatus('✅ Editor initialized successfully!', 'success');
+          console.log('Editor instance:', editorInstance);
+        } else {
+          showStatus('❌ Failed to initialize editor', 'error');
+        }
+      } catch (error) {
+        console.error('Error initializing editor:', error);
+        showStatus('❌ Error: ' + error.message, 'error');
+      }
+    }
+    
+    function destroyEditor() {
+      if (editorInstance && typeof editorInstance.unmount === 'function') {
+        try {
+          editorInstance.unmount();
+          showStatus('✅ Editor destroyed', 'success');
+          editorInstance = null;
+          
+          // Reset container
+          const container = document.getElementById('sticker-editor');
+          container.innerHTML = '<div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #666;">Click "Initialize Editor" to load the sticker editor</div>';
+        } catch (error) {
+          console.error('Error destroying editor:', error);
+          showStatus('❌ Error destroying editor: ' + error.message, 'error');
+        }
+      } else {
+        showStatus('⚠️ No editor instance to destroy', 'error');
+      }
+    }
+    
+    // Optional: Auto-initialize on page load
+    // window.addEventListener('load', initEditor);
+  </script>
+</body>
+</html>
